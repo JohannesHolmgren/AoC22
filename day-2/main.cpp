@@ -92,8 +92,7 @@ Type getAdjacent(Type arr[], int size, int pos, int dir) {
         pos: pos to take adjacent from
         dir: direction to take adjacent from   
      */
-    cout << arr[(pos + dir) % size] << endl;
-    return arr[(pos + dir) % size];
+    return arr[(pos + dir + size) % size]; // add size since -1 do not result in 2
 }
 
 char getMove(char opMove, char strat) {
@@ -105,7 +104,7 @@ char getMove(char opMove, char strat) {
     if(strat == TIE)
         return opMove;
     // Should win. Return next move mod length
-    int size = sizeof(INDEX)/sizeof(INDEX[0]);
+    int size = sizeof(CHOICE)/sizeof(CHOICE[0]);
     if(strat == WIN) {
         return getAdjacent(CHOICE, size, INDEX[opMove], 1);
         // return CHOICE[(INDEX[opMove] + 1) % (sizeof(INDEX)/sizeof(INDEX[0]))];
@@ -113,10 +112,44 @@ char getMove(char opMove, char strat) {
     // Lose
     else {
         return getAdjacent(CHOICE, size, INDEX[opMove], -1);
-    }
-    
+    }    
 }
 
+int getScore(char myMove, char strat) {
+    /* Returns score for one round */
+
+    map<char, int> choicePts = {
+        {'A', 1},
+        {'B', 2},
+        {'C', 3}
+    };
+
+    map<char, int> stratPts = {
+        {'X', 0},
+        {'Y', 3},
+        {'Z', 6}
+    };
+
+    return choicePts[myMove] + stratPts[strat];
+}
+
+
+int getTotalScore(string filename){
+    // create file reader stream
+    ifstream FileReader(filename);
+
+    int score = 0;
+    // Read row and row
+    while(getline(FileReader, filename)){
+        int roundPts = 0;
+        char opMove = filename[0];
+        char strat = filename[2];
+        // get my move
+        char myMove = getMove(opMove, strat);
+        score += getScore(myMove, strat);
+    }
+    return score;
+}
 
 
 int main() {
@@ -125,11 +158,8 @@ int main() {
     // cout << part1() << endl;
     
     // Part 2
-    char move = getMove('A', 'X');
-    cout << move << endl;
-
-    for(int i = 0; i < 4; i++)
-        cout << CHOICE[i] << endl;
-
+    string filename = "data.txt";
+    int score = getTotalScore(filename);
+    cout << score << endl;
     return 0;
 }
