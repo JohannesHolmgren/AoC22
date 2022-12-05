@@ -81,17 +81,15 @@ void moveAround(string instruction, vector<deque<char>>& position) {
     getData(instruction, data);
     for(int i = 0; i < data[0]; i++) {
         // data[0] says how many times we should move from data[1] to data[2]
-        if(position[data[1]-1].size() <= 0)
+        if(position[data[1]-1].size() <= 0) // If any one stack is empty
             return;
-        // cout << position[data[2]-1].back() << " " << position[data[1]-1].back() << "   ";
         position[data[2]-1].push_back(position[data[1]-1].back()); // add element
         position[data[1]-1].pop_back();   // remove element
     }
-    // cout << endl;
 }
 
 
-string getTopRow(vector<string> rows) {
+string getTopRow(vector<string> rows, void(*moveFunc)(string, vector<deque<char>>&)) {
     // return value
     string topRow;
 
@@ -113,7 +111,7 @@ string getTopRow(vector<string> rows) {
             }
         }
         else {
-            moveAround(row, position);
+            moveFunc(row, position);
         }
     }
 
@@ -131,6 +129,27 @@ string getTopRow(vector<string> rows) {
 /* Part 2 */
 
 
+void moveManyAround(string instruction, vector<deque<char>>& position) {
+    // Move to temporary stack and then move to new stack gets correct order
+    int data[3];
+    deque<char> tmp;
+    tmp.clear();
+    getData(instruction, data);
+    for(int i = 0; i < data[0]; i++) {
+        // data[0] says how many times we should move from data[1] to data[2]
+        if(position[data[1]-1].size() <= 0) // If any one stack is empty
+            return;
+        // position[data[2]-1].push_back(position[data[1]-1].back()); // add element
+        tmp.push_back(position[data[1]-1].back());
+        position[data[1]-1].pop_back();   // remove element
+    }
+    // move all from tmp stack to new stack
+    for(int i = 0; i < data[0]; i++) {
+        position[data[2]-1].push_back(tmp.back());
+        tmp.pop_back();
+    }
+}
+
 /* Main */
 int main() {
 
@@ -147,7 +166,12 @@ int main() {
         rows.push_back(row);
     }
 
-    string result = getTopRow(rows);
-    cout << result << endl;
+    // string result = getTopRow(rows, &moveAround);
+    // cout << result << endl;
+
+
+    // Part 2
+    string result2 = getTopRow(rows, &moveManyAround);
+    cout << result2 << endl;
 
 }
