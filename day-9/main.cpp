@@ -160,15 +160,18 @@ int getTotalVisitedPositions2(vector<pair<char, int>> data)
                 }
                 // lost connection. Check two cases:
                 //  1. only differs in one direction. Move that direction
+                if (i == 2 && t == 5)
+                {
+                }
                 if (diffX > 1 && diffY == 0)
                 {
-                    // move same direction as head
-                    current->first += direction.first;
+                    // move same direction as last visited is towards
+                    current->first += (previous->first - current->first) / abs(previous->first - current->first);
                 }
                 else if (diffY > 1 && diffX == 0)
                 {
-                    // move same direction as head
-                    current->second += direction.second;
+                    // move same direction as last visited is towards
+                    current->second += (previous->second - current->second) / abs(previous->second - current->second);
                 }
                 //  2. differs in two directions. Move diagonally towards head
                 else
@@ -180,14 +183,13 @@ int getTotalVisitedPositions2(vector<pair<char, int>> data)
                 }
                 // cout << current->first << ", " << current->second << endl;
             }
-            if (s == 2)
+            if (i == 2)
             {
-            }
-
-            cout << "Head: " << head.first << "," << head.second << endl;
-            for (int i = 0; i < TAIL_SIZE; i++)
-            {
-                cout << i << ": (" << tail[i].first << "," << tail[i].second << ")" << endl;
+                // cout << "Head: " << head.first << "," << head.second << endl;
+                for (int i = 0; i < TAIL_SIZE; i++)
+                {
+                    // cout << i << ": (" << tail[i].first << "," << tail[i].second << ")" << endl;
+                }
             }
             // add tail's last part's position to visited;
             // cout << "added " << tail[last].first << ", " << tail[last].first << endl;
