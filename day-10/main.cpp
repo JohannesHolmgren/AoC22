@@ -64,7 +64,7 @@ vector<pair<string, int>> getInstructions(vector<string> lines)
 }
 
 /* Part 1 */
-int runProgram(vector<pair<string, int>> instructions)
+int runProgram(const vector<pair<string, int>> instructions)
 {
     // Runs the instructions and calculates the signal strength
     // for the 20th, 60th, 100th, 140th, 180th and 220th clock cycle
@@ -72,9 +72,64 @@ int runProgram(vector<pair<string, int>> instructions)
     // To check if 20 or 20 + 40*N:
     //  Take (cycle - 20) mod 40. will be 0 only in the cases above
 
+    // When program should terminate
+    const int MAX_CYCLES = 220;
+    // Map for number of cycles for each instruction
+    map<string, int>
+        instructionCycles = {
+            {"noop", 1},
+            {"addx", 2}};
+
     // Check if time to read signal strength
     auto isReadTime = [](int cycle)
-    { return !(cycle - 20 % 40); };
+    { return !((cycle - 20) % 40); };
+
+    int sumSignalStrengths = 0;
+
+    int cycle = 0;
+    int regX = 1;
+
+    for (int i = 0; i < instructions.size(); i++)
+    {
+        pair<string, int> instr = instructions[i];
+        if (instr.first == "noop")
+        {
+            for (int step = 0; step < instructionCycles["noop"]; step++)
+            {
+                cycle++;
+                if (isReadTime(cycle))
+                {
+                    sumSignalStrengths += cycle * regX;
+                    cout << "sumSignalStrength: " << sumSignalStrengths << " at cycle " << cycle << " with a = " << regX << endl;
+                }
+                // If program is much larger than 220, another signal strength could be counted
+                else if (cycle > MAX_CYCLES)
+                {
+                    return sumSignalStrengths;
+                }
+            }
+        }
+        else if (instr.first == "addx")
+        {
+            // go through the steps for addx
+            for (int i = 0; i < instructionCycles[instr.first]; i++)
+            {
+                cycle++;
+                if (isReadTime(cycle))
+                {
+                    sumSignalStrengths += cycle * regX;
+                    cout << "sumSignalStrength: " << sumSignalStrengths << " at cycle " << cycle << " with X = " << regX << endl;
+                }
+                // If program is much larger than 220, another signal strength could be counted
+                else if (cycle > MAX_CYCLES)
+                {
+                    return sumSignalStrengths;
+                }
+            }
+            regX += instr.second;
+        }
+    }
+    return sumSignalStrengths;
 }
 
 /* Main */
@@ -83,6 +138,7 @@ int main()
     const string FILENAME = "data.txt";
     vector<string> data = readData(FILENAME);
     vector<pair<string, int>> instructions = getInstructions(data);
-
+    int signalStrength = runProgram(instructions);
+    cout << "Part 1: " << signalStrength << endl;
     return 0;
 }
